@@ -39,6 +39,7 @@ const FormField = ({title, value, placeholder, handleChangeText, otherStyles, ..
 
                 </TouchableOpacity>
             )}
+            
 
         </View>
     </View>

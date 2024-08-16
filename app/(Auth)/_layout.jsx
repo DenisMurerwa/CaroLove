@@ -18,6 +18,11 @@ const AuthLayout = () => {
       options={{
         headerShown: false
       }}
+      /><Stack.Screen
+      name='onboard'
+      options={{
+        headerShown: false
+      }}
       />
     </Stack>
 
