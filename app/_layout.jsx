@@ -1,13 +1,12 @@
-import {  Text, View } from 'react-native'
-import {SplashScreen, Stack} from'expo-router';
+import { Text, View } from 'react-native';
+import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import { useEffect } from 'react';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 SplashScreen.preventAutoHideAsync();
 
 const RootLayout = () => {
-
   const [fontsLoaded, error] = useFonts({
     "Poppins-Black": require("../assets/fonts/Poppins-Black.ttf"),
     "Poppins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
@@ -19,31 +18,38 @@ const RootLayout = () => {
     "Poppins-SemiBold": require("../assets/fonts/Poppins-SemiBold.ttf"),
     "Poppins-Thin": require("../assets/fonts/Poppins-Thin.ttf"),
   });
-  
+
   useEffect(() => {
     if (error) throw error;
-  
+
     if (fontsLoaded) {
       SplashScreen.hideAsync();
     }
   }, [fontsLoaded, error]);
-  
+
   if (!fontsLoaded && !error) {
     return null;
   }
-  return(
-  <Stack>
-    <Stack.Screen name='index' options={{headerShown:
-        false
-    }}/>  
-    <Stack.Screen name='(Auth)' options={{headerShown:
-        false
-    }}/>  
-  </Stack>
-  
-  
-  ) 
-}
 
-export default RootLayout
+  return (
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <Stack>
+        <Stack.Screen 
+          name='index' 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name='(Auth)' 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name='(Tabs)' 
 
+          options={{ headerShown: false }} 
+        />
+      </Stack>
+    </GestureHandlerRootView>
+  );
+};
+
+export default RootLayout;

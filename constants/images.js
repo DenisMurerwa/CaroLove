@@ -8,4 +8,5 @@ import logoSmall from "../assets/images/logo-small.png";
 import empty from "../assets/images/empty.png";
 import love from "../assets/images/love1.png";
 
+
 export default { profile, thumbnail, cards, path, logo,logo1, logoSmall, empty, love };

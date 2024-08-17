@@ -3,8 +3,8 @@ import React from 'react'
 
 const chats = () => {
   return (
-    <View>
-      <Text>chats</Text>
+    <View className='justify-center items-center min-h-[85vh] px-4'>
+      <Text className='text-3xl text-gray-100 font-bold text-center'>Chats</Text>
     </View>
   )
 }

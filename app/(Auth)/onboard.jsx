@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from 'expo-router';
+import { useRouter } from 'expo-router';
 import * as ImagePicker from 'expo-image-picker'; // For image selection
 import { ref, set } from 'firebase/database';
 import { auth, database } from '../../firebase'; // Your Firebase config
@@ -20,7 +21,8 @@ const Onboard = () => {
     gender: '' // Added gender state
   });
   const [image, setImage] = useState(null); // State to hold the image
-  const navigation = useNavigation();
+  const router = useRouter();
+
 
   const handleImagePick = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -29,25 +31,39 @@ const Onboard = () => {
       aspect: [4, 3],
       quality: 1,
     });
-
-    if (!result.canceled) {
-      setImage(result.uri);
-      setUserDetails({ ...userDetails, profilePicture: result.uri });
+  
+    if (!result.canceled && result.assets && result.assets.length > 0) {
+      const selectedImage = result.assets[0].uri;
+      setImage(selectedImage);
+      setUserDetails({ ...userDetails, profilePicture: selectedImage });
+    } else {
+      console.warn('Image selection was canceled or failed');
     }
   };
+  
 
   const handleSubmit = async () => {
     const userId = auth.currentUser.uid;
+  
+    // Check if the profilePicture is defined
+    if (!userDetails.profilePicture) {
+      console.warn('Profile picture is undefined, cannot submit.');
+      return;
+    }
+  
     try {
       await set(ref(database, `/users/${userId}`), {
         ...userDetails,
         email: auth.currentUser.email,
       });
-      navigation.navigate('home'); // Navigate to the Home page
+  
+      // Navigate to the Home page using the router
+      router.push('/home');
     } catch (error) {
       console.error(error.message);
     }
   };
+  
 
   return (
     <SafeAreaView className='bg-primary h-full'>

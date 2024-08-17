@@ -1,12 +1,14 @@
-import { View, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
-const Home = () => {
+const home = () => {
   return (
-    <View>
-      <Text>Home</Text>
+    <View className='justify-center items-center min-h-[85vh] px-4'>
+      <Text className='text-3xl text-gray-100 font-bold text-center'>home</Text>
     </View>
   )
 }
 
-export default Home
+export default home
+
+const styles = StyleSheet.create({})
