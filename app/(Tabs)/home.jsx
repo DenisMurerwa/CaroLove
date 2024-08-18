@@ -1,14 +1,17 @@
-// Home.js
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Dimensions } from 'react-native';
+import { View, Text, Image, Dimensions, Pressable } from 'react-native';
 import { get, ref } from 'firebase/database';
-import { database } from '../../firebase'; // Adjust path based on folder structure
-import AnimatedSwipeCards from '../../AnimatedSwipeCards'; // Path to the wrapper
+import { useRouter } from 'expo-router';
+import { database } from '../../firebase'; // Adjust path based on your folder structure
+import AnimatedSwipeCards from '../../AnimatedSwipeCards'; // Adjust path to your AnimatedSwipeCards wrapper
+import { useUser } from '../UserContext'; // Import the useUser hook
 
 const { width: viewportWidth } = Dimensions.get('window');
 
 const Home = () => {
   const [userData, setUserData] = useState([]);
+  const { setSelectedUser } = useUser(); // Destructure setSelectedUser from context
+  const router = useRouter(); // Hook for routing
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,9 +43,14 @@ const Home = () => {
     console.log('Card swiped down:', card);
   };
 
-  const renderCard = (item) => {
-    const imageUri = item.profilePicture || require('../../assets/images/profile.png'); // Adjust as needed
+  const handlePress = (userId) => {
+    setSelectedUser(userId); // Set the selected user in context
+    router.push('/message'); // Navigate to Messages page
+  };
 
+  const renderCard = (item) => {
+    const imageUri = item.profilePicture || require('../../assets/images/profile.png');
+  
     return (
       <View style={{
         backgroundColor: 'white',
@@ -52,20 +60,20 @@ const Home = () => {
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.2,
         shadowRadius: 6,
-        width: viewportWidth * 0.9, // Increase card width
-        height: viewportWidth * 1.5, // Increase card height
+        width: viewportWidth * 0.9,
+        height: viewportWidth * 1.5,
       }}>
         <Image
           source={{ uri: imageUri }}
           style={{
-            height: '80%', // Adjust image height
+            height: '80%',
             width: '100%',
             borderRadius: 15,
           }}
-          onError={() => setImageUri(require('../../assets/images/profile.png'))} // Fix image loading issues
+          onError={() => setImageUri(require('../../assets/images/profile.png'))}
         />
         <Text style={{
-          fontSize: 22, // Increase font size
+          fontSize: 22,
           fontWeight: 'bold',
           textAlign: 'center',
           marginTop: 12,
@@ -77,18 +85,20 @@ const Home = () => {
           justifyContent: 'center',
           marginTop: 20,
         }}>
-          <Image
-            source={require('../../assets/icons/chats.png')}
-            style={{
-              width: 40, // Increase icon size
-              height: 40,
-              marginHorizontal: 12,
-            }}
-          />
+          <Pressable onPress={() => handlePress(item.id)}>
+            <Image
+              source={require('../../assets/icons/chats.png')}
+              style={{
+                width: 40,
+                height: 40,
+                marginHorizontal: 12,
+              }}
+            />
+          </Pressable>
           <Image
             source={require('../../assets/icons/play.png')}
             style={{
-              width: 40, // Increase icon size
+              width: 40,
               height: 40,
               marginHorizontal: 12,
             }}

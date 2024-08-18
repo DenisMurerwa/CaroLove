@@ -42,7 +42,8 @@
     "react-native-screens": "3.31.1",
     "react-native-snap-carousel": "^3.9.1",
     "react-native-swipe-cards": "^0.1.1",
-    "react-native-web": "~0.19.10"
+    "react-native-web": "~0.19.10",
+    "twrnc": "^4.5.0"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",

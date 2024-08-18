@@ -1,8 +1,9 @@
+import React, { useEffect } from 'react';
 import { Text, View } from 'react-native';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
-import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import { UserProvider } from './UserContext'; // Adjust path as needed
 
 SplashScreen.preventAutoHideAsync();
 
@@ -33,21 +34,26 @@ const RootLayout = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <Stack>
-        <Stack.Screen 
-          name='index' 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name='(Auth)' 
-          options={{ headerShown: false }} 
-        />
-        <Stack.Screen 
-          name='(Tabs)' 
-
-          options={{ headerShown: false }} 
-        />
-      </Stack>
+      <UserProvider>
+        <Stack>
+          <Stack.Screen 
+            name='index' 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name='message' 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name='(Auth)' 
+            options={{ headerShown: false }} 
+          />
+          <Stack.Screen 
+            name='(Tabs)' 
+            options={{ headerShown: false }} 
+          />
+        </Stack>
+      </UserProvider>
     </GestureHandlerRootView>
   );
 };
