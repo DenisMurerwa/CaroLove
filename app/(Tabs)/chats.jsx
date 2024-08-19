@@ -2,12 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { getDatabase, ref, onValue } from 'firebase/database';
 import { useRouter } from 'expo-router';
-import { useUser } from '../UserContext'; // Adjust the path as necessary
 import { getAuth } from 'firebase/auth';
 
 const Chats = () => {
   const router = useRouter();
-  const { selectedUser } = useUser(); // Access the selected user from context
   const [chats, setChats] = useState([]);
   const [userId, setUserId] = useState(null);
 
@@ -25,7 +23,10 @@ const Chats = () => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           const chatList = Object.keys(data)
-            .filter(key => data[key].participants.includes(userId)) // Only show chats where the user is a participant
+            .filter(key => {
+              const participants = data[key].participants || [];
+              return participants.includes(userId);
+            })
             .map(key => ({
               id: key,
               ...data[key]

@@ -3,27 +3,39 @@ import { View, Text, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { getDatabase, ref, get } from 'firebase/database'; 
 import { auth } from '../../firebase'; 
 import { images } from '../../constants';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
 import { Link } from 'expo-router';
+import { useUser } from '../UserContext'; 
 
 const SignIn = () => {
-  const [form, setForm] = useState({
-    email: '',
-    password: ''
-  });
+  const [form, setForm] = useState({ email: '', password: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
+  const { setCurrentUser, setSelectedUser } = useUser(); 
 
   const submit = async () => {
     setIsSubmitting(true);
     try {
-      // Firebase Authentication sign in
-      await signInWithEmailAndPassword(auth, form.email, form.password);
-      // Navigate to the Home screen upon successful login
-      router.push('/home');
+      const userCredential = await signInWithEmailAndPassword(auth, form.email, form.password);
+      const user = userCredential.user;
+
+      const db = getDatabase();
+      const userRef = ref(db, `users/${user.uid}`);
+      const snapshot = await get(userRef);
+
+      if (snapshot.exists()) {
+        const userData = snapshot.val();
+        await setCurrentUser({ id: user.uid, ...userData });
+        setSelectedUser({ id: user.uid, ...userData }); 
+        router.push('/home');
+      } else {
+        console.error('User data not found');
+        alert('User data not found.');
+      }
     } catch (error) {
       console.error('Login failed:', error.message);
       alert('Login failed. Please check your credentials.');
@@ -56,7 +68,7 @@ const SignIn = () => {
             value={form.password}
             handleChangeText={(e) => setForm({ ...form, password: e })}
             otherStyles='mt-7'
-            secureTextEntry // To hide the password
+            secureTextEntry
           />
           <CustomButton
             title='Login'
