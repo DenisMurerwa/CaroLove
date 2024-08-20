@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TextInput, Button, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import { getDatabase, ref, push, onValue, set } from 'firebase/database';
 import { getAuth } from 'firebase/auth';
 
 const Messages = () => {
-  const { chatId, userId: selectedUserId } = useLocalSearchParams();
+  const { chatId } = useLocalSearchParams();
   const [messages, setMessages] = useState([]);
-  const [chatPartner, setChatPartner] = useState(null);
   const [newMessage, setNewMessage] = useState('');
-  const router = useRouter();
   const [userId, setUserId] = useState(null);
 
   useEffect(() => {
@@ -34,18 +32,13 @@ const Messages = () => {
     const unsubscribe = onValue(chatRef, (snapshot) => {
       if (snapshot.exists()) {
         const data = snapshot.val();
-        const currentUserId = userId;
-        const chatPartnerId = data.user1Id === currentUserId ? data.user2Id : data.user1Id;
-
         setMessages(Object.values(data.messages || {}));
-        setChatPartner(chatPartnerId);
       } else {
         console.error('No chat data available');
       }
     });
 
     return () => {
-      console.log('Unsubscribing from chat data');
       unsubscribe();
     };
   }, [chatId, userId]);
@@ -81,15 +74,27 @@ const Messages = () => {
   return (
     <View style={styles.container}>
       <ScrollView style={styles.messagesContainer}>
-        {chatPartner ? (
-          <Text style={styles.chatPartner}>Chatting with: {chatPartner}</Text>
-        ) : (
-          <Text>No chat partner found</Text>
-        )}
         {messages.length > 0 ? (
           messages.map((message, index) => (
-            <View key={index} style={styles.message}>
-              <Text>{message.text}</Text>
+            <View
+              key={index}
+              style={[
+                styles.message,
+                message.senderId === userId
+                  ? styles.sentMessage
+                  : styles.receivedMessage,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.messageText,
+                  message.senderId === userId
+                    ? styles.sentMessageText
+                    : styles.receivedMessageText,
+                ]}
+              >
+                {message.text}
+              </Text>
             </View>
           ))
         ) : (
@@ -103,7 +108,9 @@ const Messages = () => {
           onChangeText={setNewMessage}
           placeholder="Type a message"
         />
-        <Button title="Send" onPress={handleSendMessage} />
+        <TouchableOpacity style={styles.sendButton} onPress={handleSendMessage}>
+          <Text style={styles.sendButtonText}>Send</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -112,19 +119,35 @@ const Messages = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 8,
+    marginTop: 16, // Margin top for the whole container
     padding: 16,
   },
   messagesContainer: {
     flex: 1,
-  },
-  chatPartner: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
+    marginTop: 16, // Add margin to the top of messages
   },
   message: {
     marginVertical: 8,
+    padding: 10,
+    borderRadius: 8,
+    maxWidth: '75%',
+  },
+  sentMessage: {
+    alignSelf: 'flex-end',
+    backgroundColor: '#FE3C72', // Vibrant pink
+  },
+  receivedMessage: {
+    alignSelf: 'flex-start',
+    backgroundColor: '#FF9500', // Bright orange
+  },
+  messageText: {
+    color: '#fff',
+  },
+  sentMessageText: {
+    color: '#fff',
+  },
+  receivedMessageText: {
+    color: '#fff',
   },
   inputContainer: {
     flexDirection: 'row',
@@ -137,6 +160,16 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 4,
     padding: 8,
+  },
+  sendButton: {
+    backgroundColor: '#FE3C72', // Pink color for the button
+    borderRadius: 4,
+    padding: 10,
+    marginLeft: 8,
+  },
+  sendButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
 

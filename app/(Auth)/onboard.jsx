@@ -1,15 +1,14 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useNavigation } from 'expo-router';
 import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker'; // For image selection
+import * as ImagePicker from 'expo-image-picker';
 import { ref, set } from 'firebase/database';
-import { auth, database } from '../../firebase'; // Your Firebase config
+import { auth, database } from '../../firebase';
 import FormField from '../../components/FormField';
 import CustomButton from '../../components/CustomButton';
-import { images } from '../../constants'; // Ensure correct path
-import { Picker } from '@react-native-picker/picker'; // Updated import for Picker
+import { images } from '../../constants';
+import { Picker } from '@react-native-picker/picker';
 
 const Onboard = () => {
   const [userDetails, setUserDetails] = useState({
@@ -18,11 +17,10 @@ const Onboard = () => {
     maritalStatus: '',
     city: '',
     phoneNumber: '',
-    gender: '' // Added gender state
+    gender: '',
   });
-  const [image, setImage] = useState(null); // State to hold the image
+  const [image, setImage] = useState(null);
   const router = useRouter();
-
 
   const handleImagePick = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
@@ -31,7 +29,7 @@ const Onboard = () => {
       aspect: [4, 3],
       quality: 1,
     });
-  
+
     if (!result.canceled && result.assets && result.assets.length > 0) {
       const selectedImage = result.assets[0].uri;
       setImage(selectedImage);
@@ -40,37 +38,38 @@ const Onboard = () => {
       console.warn('Image selection was canceled or failed');
     }
   };
-  
 
   const handleSubmit = async () => {
     const userId = auth.currentUser.uid;
-  
-    // Check if the profilePicture is defined
+
+    // Log the values for debugging
+    console.log("Gender:", userDetails.gender);
+    console.log("Marital Status:", userDetails.maritalStatus);
+    console.log("User Details:", userDetails);
+
     if (!userDetails.profilePicture) {
       console.warn('Profile picture is undefined, cannot submit.');
       return;
     }
-  
+
     try {
       await set(ref(database, `/users/${userId}`), {
         ...userDetails,
         email: auth.currentUser.email,
       });
-  
-      // Navigate to the Home page using the router
+
       router.push('/home');
     } catch (error) {
       console.error(error.message);
     }
   };
-  
 
   return (
     <SafeAreaView className='bg-primary h-full'>
       <ScrollView>
         <View className='w-full justify-center min-h-[83vh] px-4 my-6'>
           <Image
-            source={images.logo} // Assuming the same logo is used
+            source={images.logo}
             resizeMode='contain'
             className='w-[115px] h-[135px]'
           />
@@ -91,7 +90,7 @@ const Onboard = () => {
             <Picker
               selectedValue={userDetails.maritalStatus}
               onValueChange={(itemValue) => setUserDetails({ ...userDetails, maritalStatus: itemValue })}
-              style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 5 }}
+              style={{ height: 50, width: '100%', backgroundColor: '#fff', borderRadius: 30 }}
             >
               <Picker.Item label="Single" value="single" />
               <Picker.Item label="Married" value="married" />
@@ -129,7 +128,7 @@ const Onboard = () => {
             title='Pick an Image'
             handlePress={handleImagePick}
             containerStyles='mt-7'
-            isLoading={false} // Customize if needed
+            isLoading={false}
           />
           {image && <Image source={{ uri: image }} style={{ width: 100, height: 100 }} />}
 

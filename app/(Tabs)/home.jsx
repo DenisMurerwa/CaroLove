@@ -201,6 +201,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginTop: 12,
+    color: '#FE3C72', // Pink color
+    fontFamily: 'Poppins-Bold', // Apply the custom font
   },
   icons: {
     flexDirection: 'row',

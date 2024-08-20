@@ -12,8 +12,6 @@ const Profile = () => {
   const [phoneNumber, setNumber] = useState('');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('');
-  const [maritalStatus, setRelationship] = useState('');
-  const [status, setStatus] = useState('');
   const [password, setPassword] = useState('');
   const auth = getAuth();
   const user = auth.currentUser;
@@ -31,8 +29,6 @@ const Profile = () => {
           setNumber(data.phoneNumber);
           setEmail(data.email);
           setCity(data.city);
-          setRelationship(data.maritalStatus);
-          setStatus(data.status);
         }
       });
     }
@@ -47,7 +43,7 @@ const Profile = () => {
     });
 
     if (!result.canceled) {
-      const pickedImage = result.uri;
+      const pickedImage = result.assets[0].uri; // Updated to access the URI correctly
       setImage(pickedImage);
       const db = getDatabase();
       const userRef = ref(db, 'users/' + user.uid);
@@ -61,11 +57,6 @@ const Profile = () => {
     update(userRef, {
       name,
       phoneNumber,
-      email,
-      city,
-      maritalStatus,
-      
-    
       profilePicture: image, 
     }).then(() => {
       Alert.alert('Success', 'Profile updated successfully!');
@@ -100,14 +91,16 @@ const Profile = () => {
           placeholderTextColor="#CDCDE0"
           className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-4"
         />
+        
         <TextInput
           value={email}
-          onChangeText={setEmail}
+          editable={false} // Make email non-editable
           placeholder="Email"
           placeholderTextColor="#CDCDE0"
           className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-4"
           keyboardType="email-address"
         />
+        
         <TextInput
           value={phoneNumber}
           onChangeText={setNumber}
@@ -116,17 +109,11 @@ const Profile = () => {
           className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-4"
           keyboardType="phone-pad"
         />
+        
         <TextInput
           value={city}
           onChangeText={setCity}
           placeholder="City"
-          placeholderTextColor="#CDCDE0"
-          className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-4"
-        />
-        <TextInput
-          value={maritalStatus}
-          onChangeText={setRelationship}
-          placeholder="Relationship Status"
           placeholderTextColor="#CDCDE0"
           className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-4"
         />
@@ -139,6 +126,7 @@ const Profile = () => {
           className="bg-[#F7F7F7] p-4 rounded-lg w-full mb-6"
           secureTextEntry
         />
+        
         <TouchableOpacity onPress={handleSave} className="bg-[#FE3C72] p-4 rounded-lg w-full">
           <Text className="text-white font-semibold text-center">Save Changes</Text>
         </TouchableOpacity>
